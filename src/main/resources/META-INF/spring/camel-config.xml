@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required   
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<!-- START SNIPPET: e1 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:camel2="http://camel.apache.org/schema/blueprint"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:cxf2="http://cxf.apache.org/core"
+    xmlns:cxfcore="http://cxf.apache.org/core"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="    http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd    http://cxf.apache.org/transports/http-jetty/configuration         http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd         http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+    <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" id="loggingOutInterceptor"/>
+    <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" id="loggingInInterceptor"/>
+    <bean class="bolivariano.arbitro.BodyProcessor" id="bodyProcessor"/>
+    <!--<context:property-placeholder location="file:../conf/arbitro.properties,file:../../common/uris.properties"/>-->
+    <context:property-placeholder location="file:P:\microservice\OFFLINE\arbitro\conf\arbitro.properties,file:P:\microservice\OFFLINE\common\uris.properties"/>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.pagoTarjeta}"
+        id="pagoTarjeta"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/TarjetaCash.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/TarjetaCash">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <!-- <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>-->
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.transferencia}"
+        id="transferencia"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/Transferencias.wsdl" xmlns:s="http://www.bolivariano.com/ws/Transferencias/">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <!--<entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>-->
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.consultasCuentas}"
+        id="consultasCuentas"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/ConsultasCuentas.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/ConsultasCuenta/">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:P:\microservice\OFFLINE\arbitro\conf\crypto.properties"/>
+            <!-- <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/> -->
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.otcservice}"
+        id="otcservice"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/otcservice.wsdl" xmlns:s="http://www.bolivariano.com/ws/OTCService">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.chequera}"
+        id="chequera"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/Chequera.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/Chequeras/">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.digitalizacion}"
+        id="digitalizacion"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/Digitalizacion.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/Digitalizaciones/">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.transInternacional}"
+        id="TransferenciaInternacional"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/TransferenciasInternacionales.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/TransferenciasInternacionales">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.tarjetaCoorporativa}"
+        id="TarjetaCoorporativa"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/TarjetaCorporativa.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/TarjetaCorporativa">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.tarjetaCreditoCash}"
+        id="TarjetaCreditoCash"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/TarjetaCreditoCash.wsdl" xmlns:s="http://www.bolivariano.com/CashManagement/ws/TarjetaCredito">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <cxf:cxfEndpoint
+        address="${arbitro.protocol}://${arbitro.server}:${arbitro.port}${uri.off.senae}"
+        id="Senae"
+        wsdlURL="${wsdl.directory}/ModeloNegocioCash/Senae.wsdl" xmlns:s="http://www.bolivariano.com/SENAE">
+        <cxf:properties>
+            <entry key="security.callback-handler" value="bolivariano.arbitro.UTPasswordCallback"/>
+            <entry key="security.signature.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.properties" value="file:../conf/crypto.properties"/>
+            <entry key="security.encryption.username" value="${encryption.username}"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+    <!-- this is the Camel route which proxies the real web service and forwards 
+		SOAP requests to it -->
+    <camelContext id="camelContext-67839f4d-916c-4d68-ab75-e1066c9b245a"
+        streamCache="true" xmlns="http://camel.apache.org/schema/spring">
+        <endpoint id="callPagoTarjetaOff" uri="${offline.protocol}://${offline.server}:${offline.port}${uri.off.pagoTarjeta}"/>
+        <endpoint id="callPagoTarjetaCont" uri="${contigencia.protocol}://${contigencia.server}:${contigencia.port}${uri.bus.pagoTarjeta}"/>
+        <endpoint id="callPagoTarjeta" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.pagoTarjeta}"/>
+        <endpoint id="callTransferenciaOff" uri="${offline.protocol}://${offline.server}:${offline.port}${uri.off.transferencia}"/>
+        <endpoint id="callTransferenciaCont" uri="${contigencia.protocol}://${contigencia.server}:${contigencia.port}${uri.bus.transferencia}"/>
+        <endpoint id="callTransferencia" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.transferencia}"/>
+        <endpoint id="callConsultasCuentasOff" uri="${offline.protocol}://${offline.server}:${offline.port}${uri.off.consultasCuentas}"/>
+        <endpoint id="callConsultasCuentasCont" uri="${contigencia.protocol}://${contigencia.server}:${contigencia.port}${uri.bus.consultasCuentas}"/>
+        <endpoint id="callConsultasCuentas" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.consultasCuentas}"/>
+        <endpoint id="callotcservice" uri="${otc.protocol}://${otc.server}:${otc.port}${uri.bus.otcservice}"/>
+        <endpoint id="callChequera" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.chequera}"/>
+        <endpoint id="callDigitalizacion" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.digitalizacion}"/>
+        <endpoint id="callTransferenciaInternacional" uri="${proxy.protocol}://${proxy.server}:$proxy.port}${uri.bus.transInternacional}"/>
+        <endpoint id="callTarjetaCorporatival" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.tarjetaCoorporativa}"/>
+        <endpoint id="callTarjetaCreditoCash" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.tarjetaCreditoCash}"/>
+        <endpoint id="callSenae" uri="${proxy.protocol}://${proxy.server}:${proxy.port}${uri.bus.senae}"/>
+        <!-- TarjetaCash -->
+        <route id="_routeTarjeta" streamCache="true">
+            <from id="_from1" uri="cxf:bean:pagoTarjeta?dataFormat=PAYLOAD"/>
+            <process id="_process1" ref="bodyProcessor"/>
+            <log id="_log2" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <removeHeaders id="_removeHeaders1" pattern="CamelHttp*"/>
+            <choice id="_choice1">
+                <when id="_when1">
+                    <simple>${in.header.modoArbitro} == "offline"</simple>
+                    <to id="_to1" ref="callPagoTarjetaOff"/>
+                    <setBody id="_setBody1">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <when id="_when2">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to2" ref="callPagoTarjeta"/>
+                    <setBody id="_setBody2">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise1">
+                    <log id="_log7" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader1">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- TarjetaCreditoCash -->
+        <route id="_routeTarjetaCreditocASH" streamCache="true">
+            <from id="_from9" uri="cxf:bean:TarjetaCreditoCash?dataFormat=PAYLOAD"/>
+            <process id="_process9" ref="bodyProcessor"/>
+            <log id="_log1" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <removeHeaders id="_removeHeaders2" pattern="CamelHttp*"/>
+            <choice id="_choice10">
+                <when id="_when23">
+                    <simple>${in.header.modoArbitro} == "offline"</simple>
+                    <choice id="_choice11">
+                        <when id="_when24">
+                            <simple>${in.headers.operationName} == "ejecutarPagoTarjetaCreditoInternacional"</simple>
+                            <setBody id="_setBody23">
+                                <constant>&lt;MensajeSalidaEjecutarPagoTarjetaCreditoInternacional xmlns:men="http://www.bolivariano.com/CashManagement/MensajeCredimatic"&gt; &lt;codigoError&gt;7011&lt;/codigoError&gt;&lt;codigoErrorRemoto&gt;7011&lt;/codigoErrorRemoto&gt;&lt;mensajeSistema&gt;Transaccion no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transaccion no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/MensajeSalidaEjecutarPagoTarjetaCreditoInternacional&gt;</constant>
+                            </setBody>
+                        </when>
+                        <otherwise id="_otherwise10">
+                            <to id="_to13" ref="callTarjetaCreditoCash"/>
+                            <setBody id="_setBody24">
+                                <xpath>//*[local-name()='Body']/*</xpath>
+                            </setBody>
+                        </otherwise>
+                    </choice>
+                </when>
+                <when id="_when25">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to14" ref="callTarjetaCreditoCash"/>
+                    <setBody id="_setBody25">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise11">
+                    <log id="_log3" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader2">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- Transferencias -->
+        <route id="Transferecias" streamCache="true">
+            <from id="_from2" uri="cxf:bean:transferencia?dataFormat=PAYLOAD"/>
+            <process id="_process2" ref="bodyProcessor"/>
+            <log id="_log8" loggingLevel="DEBUG" message="MODO ARBITRO ${in.header.modoArbitro}"/>
+            <log id="_log9" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <removeHeaders id="_removeHeaders3" pattern="CamelHttp*"/>
+            <choice id="_choice2">
+                <when id="_when3">
+                    <simple>${in.header.modoArbitro} == "offline"</simple>
+                    <to id="_to3" ref="callTransferenciaOff"/>
+                    <setBody id="_setBody3">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <when id="_when4">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to4" ref="callTransferencia"/>
+                    <setBody id="_setBody4">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise2">
+                    <log id="_log14" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader3">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- ConsultaCuentas -->
+        <route id="ConsultaCuentas" streamCache="true">
+            <from id="_from3" uri="cxf:bean:consultasCuentas?dataFormat=PAYLOAD"/>
+            <process id="_process3" ref="bodyProcessor"/>
+            <log id="_log15" loggingLevel="DEBUG" message="MODO ARBITRO ${in.header.modoArbitro}"/>
+            <log id="_log16" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <choice id="_choice3">
+                <when id="_when5">
+                    <simple>${in.header.modoArbitro} == "offline"</simple>
+                    <removeHeaders id="_removeHeaders5" pattern="CamelHttp*"/>
+                    <log id="_log17" loggingLevel="WARN" message="${in.header.X-Request-Id}  MENSAJE ENVIADO ${in.header.modoArbitro}"/>
+                    <to id="_to5" ref="callConsultasCuentasOff"/>
+                    <setBody id="_setBody5">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                    <log id="_log18" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} SALIDA ${body}"/>
+                    <setHeader headerName="Request-Id" id="_setHeader5">
+                        <simple>${in.header.X-Request-Id}</simple>
+                    </setHeader>
+                </when>
+                <when id="_when6">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <removeHeaders id="_removeHeaders6" pattern="CamelHttp*"/>
+                    <log id="_log19" loggingLevel="WARN" message="${in.header.X-Request-Id}  MENSAJE ENVIADO ${in.header.modoArbitro}"/>
+                    <to id="_to6" ref="callConsultasCuentas"/>
+                    <setBody id="_setBody6">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                    <log id="_log20" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+                    <setHeader headerName="Request-Id" id="_setHeader6">
+                        <simple>${in.header.X-Request-Id}</simple>
+                    </setHeader>
+                </when>
+                <otherwise id="_otherwise3">
+                    <log id="_log21" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+        </route>
+        <!-- PAGO DE SERVICIOS -->
+        <route id="PagoSercivios" streamCache="true">
+            <from id="_from4" uri="cxf:bean:otcservice?dataFormat=PAYLOAD"/>
+            <process id="_process4" ref="bodyProcessor"/>
+            <log id="_log22" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <removeHeaders id="_removeHeaders7" pattern="CamelHttp*"/>
+            <choice id="_choice4">
+                <when id="_when7">
+                    <simple>${in.header.modoArbitro} == "offline"</simple>
+                    <choice id="_choice9">
+                        <when id="_when8">
+                            <simple>${in.headers.operationName} == "consultarDeuda"</simple>
+                            <setBody id="_setBody7">
+                                <constant>&lt;ns3:salidaConsultarDeuda xmlns:ns2="http://www.bolivariano.com/mensaje/MensajeOTC" xmlns:ns3="http://www.bolivariano.com/ws/OTCService"&gt; &lt;ns2:codigoError&gt;OTC_GTW_02&lt;/ns2:codigoError&gt; &lt;ns2:mensajeUsuario&gt;Transaccion no permitida en este horario.&lt;/ns2:mensajeUsuario&gt; &lt;/ns3:salidaConsultarDeuda&gt;</constant>
+                            </setBody>
+                        </when>
+                        <when id="_when22">
+                            <simple>${in.headers.operationName} == "ejecutarPago"</simple>
+                            <setBody id="_setBody8">
+                                <constant>&lt;ns3:salidaEjecutarPago xmlns:ns2="http://www.bolivariano.com/mensaje/MensajeOTC" xmlns:ns3="http://www.bolivariano.com/ws/OTCService"&gt; &lt;ns2:codigoError&gt;OTC_GTW_02&lt;/ns2:codigoError&gt; &lt;ns2:mensajeUsuario&gt;Transaccion no permitida en este horario.&lt;/ns2:mensajeUsuario&gt; &lt;/ns3:salidaEjecutarPago&gt;</constant>
+                            </setBody>
+                        </when>
+                        <otherwise id="_otherwise9">
+                            <to id="_to12" ref="callotcservice"/>
+                            <setBody id="_setBody22">
+                                <xpath>//*[local-name()='Body']/*</xpath>
+                            </setBody>
+                        </otherwise>
+                    </choice>
+                </when>
+                <when id="_when9">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to7" ref="callotcservice"/>
+                    <setBody id="_setBody9">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise4">
+                    <log id="_log23" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader7">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+            <log id="_log24" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} SALIDA ${body}"/>
+        </route>
+        <!-- CHEQUERA -->
+        <route id="Chequera" streamCache="true">
+            <from id="_from5" uri="cxf:bean:chequera?dataFormat=PAYLOAD"/>
+            <process id="_process5" ref="bodyProcessor"/>
+            <log id="_log25" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA ${body}"/>
+            <removeHeaders id="_removeHeaders8" pattern="CamelHttp*"/>
+            <log id="_log26" loggingLevel="WARN" message="${in.header.X-Request-Id}  MENSAJE ENVIADO ${in.header.modoArbitro}"/>
+            <choice id="_choice5">
+                <when id="_when10">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "bloquearCheques"</simple>
+                    <setBody id="_setBody10">
+                        <constant>&lt;ns1:mensajeSalidaBloquearChequesPropios xmlns:ns1="http://www.bolivariano.com/CashManagement/MensajesChequeras"&gt; &lt;codigoError&gt;70011&lt;/codigoError&gt; &lt;codigoErrorRemoto&gt;70011&lt;/codigoErrorRemoto&gt; &lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt; &lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt; &lt;/ns1:mensajeSalidaBloquearChequesPropios&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when11">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "obtenerChequesPropios"</simple>
+                    <setBody id="_setBody11">
+                        <constant>&lt;men:mensajeSalidaObtenerChequesPropios xmlns:men="http://www.bolivariano.com/CashManagement/MensajesChequeras"&gt;&lt;codigoError&gt;70011&lt;/codigoError&gt;&lt;codigoErrorRemoto&gt;70011&lt;/codigoErrorRemoto&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario&lt;/mensajeUsuario&gt;&lt;/men:mensajeSalidaObtenerChequesPropios&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when12">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "registrarSolicitudChequera"</simple>
+                    <setBody id="_setBody12">
+                        <constant>&lt;men:mensajeSalidaRegistrarSolicitudChequera xmlns:men="http://www.bolivariano.com/CashManagement/MensajesChequeras"&gt;&lt;codigoError&gt;70011&lt;/codigoError&gt;&lt;codigoErrorRemoto&gt;70011&lt;/codigoErrorRemoto&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario&lt;/mensajeUsuario&gt;&lt;/men:mensajeSalidaRegistrarSolicitudChequera&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when13">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "obtenerCostosEmisionChequera"</simple>
+                    <setBody id="_setBody13">
+                        <constant>&lt;men:mensajeSalidaObtenerCostosEmisionChequera xmlns:men="http://www.bolivariano.com/CashManagement/MensajesChequeras"&gt;
+                        &lt;codigoError&gt;70011&lt;/codigoError&gt;&lt;codigoErrorRemoto&gt;70011&lt;/codigoErrorRemoto&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario&lt;/mensajeUsuario&gt;
+                        &lt;/men:mensajeSalidaObtenerCostosEmisionChequera&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when14">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <log id="_log27" loggingLevel="WARN" message="${in.header.X-Request-Id}  MENSAJE ENVIADO ${in.header.modoArbitro}"/>
+                    <to id="_to8" ref="callChequera"/>
+                    <setBody id="_setBody14">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise5">
+                    <log id="_log28" message="CONFIGURAR CONTINGENCIA ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader8">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+            <log id="_log29" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} SALIDA ${body}"/>
+        </route>
+        <!-- Digitalizacion -->
+        <route id="_routeDigita1" streamCache="true">
+            <from id="_from6" uri="cxf:bean:digitalizacion?dataFormat=PAYLOAD"/>
+            <process id="_process6" ref="bodyProcessor"/>
+            <log id="_log30" loggingLevel="DEBUG" message="MODO ARBITRO: ${in.header.modoArbitro}"/>
+            <log id="_log31" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA: ${body}"/>
+            <removeHeaders id="_removeHeaders9" pattern="CamelHttp*"/>
+            <choice id="_choice6">
+                <when id="_when15">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "obtenerDocumentosOperativos"</simple>
+                    <setBody id="_setBody15">
+                        <constant>&lt;men:mensajeSalidaObtenerDocumentosOperativos xmlns:men="http://www.bolivariano.com/CashManagement/MensajeDigitalizaciones/"&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/men:mensajeSalidaObtenerDocumentosOperativos&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when16">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to9" ref="callDigitalizacion"/>
+                    <setBody id="_setBody16">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise6">
+                    <log id="_log32" message="CONFIGURAR CONTINGENCIA: ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader9">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- transferencia Internacional -->
+        <route id="TransferenciaInter" streamCache="true">
+            <from id="_from7" uri="cxf:bean:TransferenciaInternacional?dataFormat=PAYLOAD"/>
+            <process id="_process7" ref="bodyProcessor"/>
+            <log id="_log33" loggingLevel="DEBUG" message="MODO ARBITRO: ${in.header.modoArbitro}"/>
+            <log id="_log34" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA: ${body}"/>
+            <removeHeaders id="_removeHeaders10" pattern="CamelHttp*"/>
+            <choice id="_choice7">
+                <when id="_when17">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "ejecutarTransferencia"</simple>
+                    <setBody id="_setBody17">
+                        <constant>&lt;men:mensajeSalidaEjecutarTransferencia xmlns:men="http://www.bolivariano.com/CashManagement/MensajeTransferenciasInternacionales"&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/men:mensajeSalidaEjecutarTransferencia&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when18">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "obtenerISD"</simple>
+                    <setBody id="_setBody18">
+                        <constant>&lt;men:mensajeSalidaObtenerISD xmlns:men="http://www.bolivariano.com/CashManagement/MensajeTransferenciasInternacionales"&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/men:mensajeSalidaObtenerISD&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when19">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to10" ref="callTransferenciaInternacional"/>
+                    <setBody id="_setBody19">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise7">
+                    <log id="_log35" message="CONFIGURAR CONTINGENCIA: ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader10">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- tarjetaCoorporativa -->
+        <route id="_routeTarjetaCoorporativa" streamCache="true">
+            <from id="_from8" uri="cxf:bean:TarjetaCoorporativa?dataFormat=PAYLOAD"/>
+            <process id="_process8" ref="bodyProcessor"/>
+            <log id="_log36" loggingLevel="DEBUG" message="MODO ARBITRO: ${in.header.modoArbitro}"/>
+            <log id="_log37" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA: ${body}"/>
+            <removeHeaders id="_removeHeaders11" pattern="CamelHttp*"/>
+            <choice id="_choice8">
+                <when id="_when20">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "pagar"</simple>
+                    <setBody id="_setBody20">
+                        <constant>&lt;men:MensajeSalidaPagar xmlns:men="http://www.bolivariano.com/CashManagement/MensajesTarjetaCorporativa"&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/men:MensajeSalidaPagar&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when21">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to11" ref="callTransferenciaInternacional"/>
+                    <setBody id="_setBody21">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise8">
+                    <log id="_log38" message="CONFIGURAR CONTINGENCIA: ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader11">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+        <!-- SENAE -->
+        <route id="_routeSenae" streamCache="true">
+            <from id="_from10" uri="cxf:bean:Senae?dataFormat=PAYLOAD"/>
+            <process id="_process10" ref="bodyProcessor"/>
+            <log id="_log4" loggingLevel="DEBUG" message="MODO ARBITRO: ${in.header.modoArbitro}"/>
+            <log id="_log5" loggingLevel="DEBUG" message="${in.header.X-Request-Id} ${in.header.modoArbitro} ENTRADA: ${body}"/>
+            <removeHeaders id="_removeHeaders4" pattern="CamelHttp*"/>
+            <choice id="_choice12">
+                <when id="_when26">
+                    <simple>${in.header.modoArbitro} == "offline" and ${in.headers.operationName} == "consultar"</simple>
+                    <setBody id="_setBody26">
+                        <constant>&lt;men:MensajeSalidaConsultar xmlns:men="http://www.bolivariano.com/MensajeSENAE"&gt;&lt;mensajeSistema&gt;Transacción no permitida en este horario.&lt;/mensajeSistema&gt;&lt;mensajeUsuario&gt;Transacción no permitida en este horario.&lt;/mensajeUsuario&gt;&lt;/men:MensajeSalidaConsultar&gt;</constant>
+                    </setBody>
+                </when>
+                <when id="_when27">
+                    <simple>${in.header.modoArbitro} == "online"</simple>
+                    <to id="_to15" ref="callSenae"/>
+                    <setBody id="_setBody27">
+                        <xpath>//*[local-name()='Body']/*</xpath>
+                    </setBody>
+                </when>
+                <otherwise id="_otherwise12">
+                    <log id="_log6" message="CONFIGURAR CONTINGENCIA: ${body}"/>
+                </otherwise>
+            </choice>
+            <setHeader headerName="Request-Id" id="_setHeader4">
+                <simple>${in.header.X-Request-Id}</simple>
+            </setHeader>
+        </route>
+    </camelContext>
+</beans>
